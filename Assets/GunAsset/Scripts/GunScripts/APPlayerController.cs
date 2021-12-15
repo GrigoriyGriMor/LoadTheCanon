@@ -105,6 +105,27 @@ public class APPlayerController : MonoBehaviour
 
             other.GetComponent<APInteractbleObjController>().UseObject();
         }
+
+        if (!loadInGun && other.GetComponent<GunController>())
+        {
+            StartCoroutine(LoadAmmoInGun(other.GetComponent<GunController>()));
+        }
+    }
+
+    bool loadInGun = false;
+    private IEnumerator LoadAmmoInGun(GunController gun)
+    {
+        loadInGun = true;
+        while (activeObjCount > 0)
+        {
+            activeObjCount -= 1;
+            gun.LoadAmmo(cartrigeList[activeObjCount].type);
+            cartrigeList[activeObjCount].visual.SetActive(false);
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        loadInGun = false;
     }
 
     public void UpgradeCartrigeActiveCount(CartrigeSetting.CartrigeType _type = CartrigeSetting.CartrigeType.mashineGun)

@@ -144,7 +144,7 @@ public void StartGame()
             startParticals[i].Play();
     }
 
-    public void EndGame()
+    public void EndGame(bool win = false)
     {
         gameIsPlayed = false;
         timeGo = false;

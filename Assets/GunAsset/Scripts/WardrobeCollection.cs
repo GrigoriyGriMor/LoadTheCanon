@@ -29,7 +29,7 @@ public class WardrobeCollection : MonoBehaviour
 
     private IEnumerator CountControl()
     {
-        if (APGameController.Instance.gameIsPlayed)
+        if (GameController.Instance.gameIsPlayed)
         {
             yield return new WaitForSeconds(0.05f);
 
