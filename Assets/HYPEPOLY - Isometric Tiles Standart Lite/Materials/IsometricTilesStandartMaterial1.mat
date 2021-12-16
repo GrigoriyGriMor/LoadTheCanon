@@ -129,7 +129,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 0.6476949, g: 0.6698113, b: 0.6476949, a: 1}
+    - _Color: {r: 0.48780704, g: 0.5471698, b: 0.48780704, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HColor: {r: 0.785, g: 0.785, b: 0.785, a: 1}
     - _HeightFogColor: {r: 0.5896226, g: 0.8852418, b: 1, a: 1}

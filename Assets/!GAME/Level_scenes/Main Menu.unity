@@ -657,7 +657,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Max Ammo
+  m_text: Max ammo
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3c04b0528724f974ba12793dcb8f842d, type: 2}
   m_sharedMaterial: {fileID: 4944963899283264478, guid: 3c04b0528724f974ba12793dcb8f842d, type: 2}
