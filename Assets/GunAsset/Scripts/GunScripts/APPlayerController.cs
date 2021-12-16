@@ -108,7 +108,8 @@ public class APPlayerController : MonoBehaviour
 
         if (!loadInGun && other.GetComponent<GunController>())
         {
-            StartCoroutine(LoadAmmoInGun(other.GetComponent<GunController>()));
+            if (other.GetComponent<GunController>().playerGun)
+                StartCoroutine(LoadAmmoInGun(other.GetComponent<GunController>()));
         }
     }
 
@@ -135,9 +136,9 @@ public class APPlayerController : MonoBehaviour
     {
         cartrigeList[activeObjCount].visual.SetActive(true);
         if (_type == CartrigeSetting.CartrigeType.mashineGun) 
-            cartrigeList[activeObjCount].visual.GetComponent<MeshRenderer>().material = electrickMat;
+            cartrigeList[activeObjCount].visual.transform.GetChild(0).GetComponent<MeshRenderer>().material = electrickMat;
         else
-            cartrigeList[activeObjCount].visual.GetComponent<MeshRenderer>().material = roketMat;
+            cartrigeList[activeObjCount].visual.transform.GetChild(0).GetComponent<MeshRenderer>().material = roketMat;
 
         cartrigeList[activeObjCount].type = _type;
         activeObjCount += 1;
