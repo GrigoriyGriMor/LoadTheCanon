@@ -63,9 +63,17 @@ public class CompetitorController : MonoBehaviour
         anim.SetBool("Run", false);
     }
 
+    [SerializeField] private Material electrickMat;
+    [SerializeField] private Material roketMat;
+
     public void UpgradeCartrigeActiveCount(CartrigeSetting.CartrigeType _type = CartrigeSetting.CartrigeType.mashineGun)
     {
         cartrigeList[activeObjCount].visual.SetActive(true);
+                if (_type == CartrigeSetting.CartrigeType.mashineGun) 
+            cartrigeList[activeObjCount].visual.GetComponent<MeshRenderer>().material = electrickMat;
+        else
+            cartrigeList[activeObjCount].visual.GetComponent<MeshRenderer>().material = roketMat;
+        
         cartrigeList[activeObjCount].type = _type;
         activeObjCount += 1;
 
@@ -105,19 +113,30 @@ public class CompetitorController : MonoBehaviour
         time += Time.deltaTime;
     }
 
+    bool loadInGun = false;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<ExitZone>())
+        if (!loadInGun && other.GetComponent<GunController>())
         {
-            if (activeObjCount == 0) return;
-
-            activeObjCount = 0;
-
-            for (int i = 0; i < cartrigeList.Count; i++)
-                cartrigeList[i].visual.SetActive(false);
+            StartCoroutine(LoadAmmoInGun(other.GetComponent<GunController>()));
 
             target = WardrobeCollection.Instance.ChekNewTarget();
             AI.destination = target.position;
         }
+    }
+
+    private IEnumerator LoadAmmoInGun(GunController gun)
+    {
+        loadInGun = true;
+        while (activeObjCount > 0)
+        {
+            activeObjCount -= 1;
+            gun.LoadAmmo(cartrigeList[activeObjCount].type);
+            cartrigeList[activeObjCount].visual.SetActive(false);
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        loadInGun = false;
     }
 }

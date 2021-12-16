@@ -128,9 +128,17 @@ public class APPlayerController : MonoBehaviour
         loadInGun = false;
     }
 
+    [SerializeField] private Material electrickMat;
+    [SerializeField] private Material roketMat;
+
     public void UpgradeCartrigeActiveCount(CartrigeSetting.CartrigeType _type = CartrigeSetting.CartrigeType.mashineGun)
     {
         cartrigeList[activeObjCount].visual.SetActive(true);
+        if (_type == CartrigeSetting.CartrigeType.mashineGun) 
+            cartrigeList[activeObjCount].visual.GetComponent<MeshRenderer>().material = electrickMat;
+        else
+            cartrigeList[activeObjCount].visual.GetComponent<MeshRenderer>().material = roketMat;
+
         cartrigeList[activeObjCount].type = _type;
         activeObjCount += 1;
     }

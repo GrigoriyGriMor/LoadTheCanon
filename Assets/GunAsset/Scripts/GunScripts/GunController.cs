@@ -5,19 +5,21 @@ using System;
 
 public class GunController : MonoBehaviour
 {
-    //Lists
-    [SerializeField] private List<CartrigeSetting.CartrigeType> oboyma = new List<CartrigeSetting.CartrigeType>();
-    [SerializeField] private List<GameObject> rockets = new List<GameObject>();
-    [SerializeField] private List<GameObject> machineguns = new List<GameObject>();
-
     [SerializeField] private Transform firePos;
-    
+
+    //Lists
+    private List<CartrigeSetting.CartrigeType> oboyma = new List<CartrigeSetting.CartrigeType>();
+    private List<GameObject> rocketsPool = new List<GameObject>();
+    private List<GameObject> machinegunsPool = new List<GameObject>();
+
     //Parameters
     [Header("Parameters")]
     [SerializeField] private int RocketAmount;
     [SerializeField] private int MachinegunAmount;
-    [SerializeField] private int health;
     [SerializeField] private float fireCoolDown = 0.5f;
+
+    [SerializeField] private int health;
+    [SerializeField] private ParticleSystem deathParticle;
 
     //References
     [Header("References")]
@@ -30,29 +32,32 @@ public class GunController : MonoBehaviour
 
     [Header("CartrigeIn Setting")]
     [SerializeField] private Transform setPosition;
+
+    [Header("Ракеты")]
     [SerializeField] private GameObject visualRocketChest;
+    private List<GameObject> visualRocketPool = new List<GameObject>();
+
+    [Header("Пулемет")]
     [SerializeField] private GameObject visualMinigunChest;
-    [SerializeField] private List<GameObject> visualRocketList = new List<GameObject>();
-    [SerializeField] private List<GameObject> visualMinigunList = new List<GameObject>();
+    private List<GameObject> visualMinigunPool = new List<GameObject>();
 
     [SerializeField] private float parcerSetObj = 1;
 
     void Start()
     {
-        if (RocketAmount > 0 && MachinegunAmount > 0)
-            GenerateAmmo();
+        GenerateAmmo();
 
         for (int i = 0; i < 10; i++)
         {
             GameObject go = Instantiate(visualRocketChest, setPosition.position, setPosition.rotation, setPosition);
-            visualRocketList.Add(go);
+            visualRocketPool.Add(go);
             go.SetActive(false);
         }
 
         for (int i = 0; i < 10; i++)
         {
             GameObject go = Instantiate(visualMinigunChest, setPosition.position, setPosition.rotation, setPosition);
-            visualMinigunList.Add(go);
+            visualMinigunPool.Add(go);
             go.SetActive(false);
         }
     }
@@ -63,21 +68,6 @@ public class GunController : MonoBehaviour
         //Fire if one or more ammo in oboyma
         if (!fire && oboyma.Count > 0)
             StartCoroutine(Fire());
-
-        //Death function
-        if (!die && health <= 0)
-        {
-            Death();
-            die = true;
-        }
-    }
-
-    public bool isFriendly()
-    {
-        if (playerGun)
-            return true;
-        else
-            return false;
     }
 
     //Load ammo from player
@@ -87,8 +77,8 @@ public class GunController : MonoBehaviour
 
         switch (_ammoType)
         {
-            case CartrigeSetting.CartrigeType.mashineGun:
-                GameObject go = GetFree(visualMinigunList);
+            case CartrigeSetting.CartrigeType.mashineGun :
+                GameObject go = GetFree(visualMinigunPool);
 
                 //if (go == null) break;
 
@@ -96,8 +86,8 @@ public class GunController : MonoBehaviour
                 go.transform.position = new Vector3(setPosition.position.x, setPosition.position.y + (parcerSetObj * oboyma.Count), setPosition.position.z);
                 break;
 
-            case CartrigeSetting.CartrigeType.roket:
-                GameObject go1 = GetFree(visualRocketList);
+            case CartrigeSetting.CartrigeType.roket :
+                GameObject go1 = GetFree(visualRocketPool);
 
                // if (go1 == null) break;
 
@@ -118,32 +108,64 @@ public class GunController : MonoBehaviour
             if (oboyma[i] == CartrigeSetting.CartrigeType.roket)
             {
                 //Placing rocket on the barrel
-                GameObject go = GetFree(rockets);
+                GameObject go = GetFree(rocketsPool);
                 if (go != null)
                 {
                     go.transform.position = firePos.position;
+                    go.transform.rotation = firePos.rotation;
                     go.SetActive(true);
                 }
 
-                for (int j = 0; j < visualRocketList.Count; j ++)
-                    if (visualRocketList[i].activeInHierarchy)
-                        visualRocketList[i].SetActive(false);
+                bool q = false;
+
+                for (int j = 0; j < visualRocketPool.Count; j++)
+                {
+                    if (visualRocketPool[j].activeInHierarchy)
+                    {
+                        if (!q)
+                        {
+                            visualRocketPool[j].SetActive(false);
+                            q = true;
+                        }
+                        else
+                        {
+                            visualRocketPool[j].transform.position = new Vector3(visualRocketPool[j].transform.position.x, visualRocketPool[j].transform.position.y - parcerSetObj,
+                                visualRocketPool[j].transform.position.z);
+                        }
+                    }
+                }
             }
 
             //Fire machinegun
             if (oboyma[i] == CartrigeSetting.CartrigeType.mashineGun)
             {
-                GameObject go = GetFree(machineguns);
+                GameObject go = GetFree(machinegunsPool);
 
                 if (go != null)
                 {
                     go.transform.position = firePos.position;
+                    go.transform.rotation = firePos.rotation;
                     go.SetActive(true);
                 }
 
-                for (int j = 0; j < visualMinigunList.Count; j++)
-                    if (visualMinigunList[i].activeInHierarchy)
-                        visualMinigunList[i].SetActive(false);
+                bool q = false;
+
+                for (int j = 0; j < visualMinigunPool.Count; j++)
+                {
+                    if (visualMinigunPool[j].activeInHierarchy)
+                    {
+                        if (!q)
+                        {
+                            visualMinigunPool[j].SetActive(false);
+                            q = true;
+                        }
+                        else
+                        {
+                            visualMinigunPool[j].transform.position = new Vector3(visualMinigunPool[j].transform.position.x, visualMinigunPool[j].transform.position.y - parcerSetObj,
+                                visualMinigunPool[j].transform.position.z);
+                        }
+                    }
+                }    
             }
 
             if (gunShot != null) gunShot.Play();
@@ -161,16 +183,16 @@ public class GunController : MonoBehaviour
         //Generate Rockets
         for (int i = 0; i < RocketAmount; i++)
         {
-            var obj = Instantiate(rocket);
-            rockets.Add(obj);
+            GameObject obj = Instantiate(rocket);
+            rocketsPool.Add(obj);
             obj.SetActive(false);
         }
 
         //Generate Bullets
         for (int i = 0; i < MachinegunAmount; i++)
         {
-            var obj = Instantiate(machinegun);
-            machineguns.Add(obj);
+            GameObject obj = Instantiate(machinegun);
+            machinegunsPool.Add(obj);
             obj.SetActive(false);
         }
     }
@@ -179,15 +201,37 @@ public class GunController : MonoBehaviour
     {
         List<GameObject> targets = new List<GameObject>();
         for (int i = 0; i < obj.Count; i++)
-            if (!obj[i].gameObject.activeInHierarchy)
+            if (!obj[i].activeInHierarchy)
                 return obj[i];
 
-        return null;
+        if (obj.Count != 0)
+            return obj[0];
+        else
+            return null;
     }
 
+    public bool isFriendly()
+    {
+        if (playerGun)
+            return true;
+        else
+            return false;
+    }
+
+    public void SetDamage(int _damage)
+    {
+        health -= _damage;
+
+        //Death function
+        if (!die && health <= 0)
+            Death();
+    }
 
     void Death()
     {
+        die = true;
+        if (deathParticle != null) deathParticle.Play();
+
         if (playerGun)
             GameController.Instance.EndGame(false);
         else
